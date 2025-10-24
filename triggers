@@ -1,0 +1,47 @@
+CREATE TABLE Employee7 (
+    EmpID      NUMBER PRIMARY KEY,
+    EmpName    VARCHAR2(100),
+    Department VARCHAR2(50),
+    Salary     NUMBER,
+    HireDate   DATE
+);
+CREATE TABLE OldEmployee (
+    EmpID      NUMBER,
+    EmpName    VARCHAR2(100),
+    Department VARCHAR2(50),
+    Salary     NUMBER,
+    HireDate   DATE,
+    DeletedDate DATE
+);
+CREATE OR REPLACE TRIGGER trg_employee_delete
+BEFORE DELETE ON Employee7
+FOR EACH ROW
+BEGIN
+    INSERT INTO OldEmployee (
+        EmpID,
+        EmpName,
+        Department,
+        Salary,
+        HireDate,
+        DeletedDate
+    ) VALUES (
+        :OLD.EmpID,
+        :OLD.EmpName,
+        :OLD.Department,
+        :OLD.Salary,
+        :OLD.HireDate,
+        SYSDATE
+    );
+END;
+/
+Insert sample data
+INSERT INTO Employee7 VALUES (1, 'Alice', 'HR', 50000, DATE '2020-01-15');
+INSERT INTO Employee7 VALUES (2, 'Bob', 'IT', 60000, DATE '2019-03-10');
+COMMIT;
+
+DELETE FROM Employee7 WHERE EmpID = 1;
+COMMIT;
+
+SELECT * FROM OldEmployee;
+
+
